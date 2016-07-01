@@ -84,7 +84,9 @@ Wraps a reducer so that it only handles Flux Standard Actions of a certain type.
 
 If a single reducer is passed, it is used to handle both normal actions and failed actions. (A failed action is analogous to a rejected promise.) You can use this form if you know a certain type of action will never fail, like the increment example above.
 
-Otherwise, you can specify separate reducers for `next()` and `throw()`. This API is inspired by the ES6 generator interface.
+Otherwise, you can specify separate reducers for `next()` and `throw()`. These values can only be functions or null-equivalents. 
+
+This API is inspired by the ES6 generator interface.
 
 ```js
 handleAction('FETCH_DATA', {
@@ -92,6 +94,8 @@ handleAction('FETCH_DATA', {
   throw(state, action) {...}
 });
 ```
+
+If `undefined` or `null` is passed in either the single reducer form, or as the values of `next` or `throw` in the map form, an error is thrown.  
 
 The optional third parameter specifies a default or initial state, which is used when `undefined` is passed to the reducer.
 

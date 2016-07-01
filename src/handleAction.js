@@ -1,3 +1,6 @@
+import identity from 'lodash.identity';
+import isNil from 'lodash.isnil';
+
 function isFunction(val) {
   return typeof val === 'function';
 }
@@ -7,22 +10,25 @@ export default function handleAction(type, reducers, defaultState) {
     ? type.toString()
     : type;
 
+  let [nextReducer, throwReducer] = isFunction(reducers)
+    ? [reducers, reducers]
+    : [reducers.next, reducers.throw];
+
+  if (isNil(nextReducer)) {
+    nextReducer = identity;
+  }
+  if (isNil(throwReducer)) {
+    throwReducer = identity;
+  }
+
+  if (!isFunction(nextReducer) || !isFunction(throwReducer)) {
+    throw new TypeError('reducers should be a function or map of next/throw functions');
+  }
+
   return (state = defaultState, action) => {
-    // If action type does not match, return previous state
-    if (action.type !== typeValue) return state;
-
-    const handlerKey = action.error === true ? 'throw' : 'next';
-
-    // If function is passed instead of map, use as reducer
-    if (isFunction(reducers)) {
-      reducers.next = reducers.throw = reducers;
+    if (action.type !== typeValue) {
+      return state;
     }
-
-    // Otherwise, assume an action map was passed
-    const reducer = reducers[handlerKey];
-
-    return isFunction(reducer)
-      ? reducer(state, action)
-      : state;
+    return action.error === true ? throwReducer(state, action) : nextReducer(state, action);
   };
 }
