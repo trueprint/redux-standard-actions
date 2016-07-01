@@ -1,0 +1,91 @@
+---
+parser: babel-eslint
+env:
+  node: true
+  es6: true
+extends:
+  - eslint:recommended
+  - plugin:import/errors
+  - standard
+  - airbnb-base
+rules:
+  import/no-named-as-default: error
+  import/no-named-as-default-member: error
+  import/no-duplicates: error
+  import/no-commonjs: error
+  import/no-amd: error
+  import/no-deprecated: error
+  import/no-mutable-exports: error
+  import/prefer-default-export: error
+  import/order:
+  - error
+  - newlines-between: always
+  import/newline-after-import: error
+  space-before-function-paren: off
+  prefer-arrow-callback: off
+  array-bracket-spacing:
+  - error
+  - always
+  comma-dangle:
+  - error
+  - always-multiline
+  comma-spacing:
+  - error
+  -
+    before: false
+    after: true
+  comma-style: error
+  eol-last: error
+  func-names: error
+  func-style:
+  - error
+  - declaration
+  - allowArrowFunctions: true
+  indent:
+  - error
+  - 2
+  key-spacing: error
+  max-len:
+  - error
+  - 120
+  no-class-assign: error
+  no-func-assign: error
+  no-else-return: error
+  no-extra-parens:
+  - error
+  - all
+  - nestedBinaryExpressions: false
+  no-multiple-empty-lines:
+  - error
+  - max: 1
+  no-unsafe-finally: error
+  no-useless-computed-key: error
+  no-useless-constructor: error
+  no-useless-rename:
+  - error
+  -
+    ignoreImport: true
+    ignoreExport: true
+  no-var: error
+  no-underscore-dangle: off
+  object-curly-spacing:
+  - error
+  - always
+  prefer-const: error
+  prefer-rest-params: error
+  prefer-template: error
+  quotes:
+  - error
+  - single
+  - avoid-escape
+  semi:
+  - error
+  - never
+  template-curly-spacing: error
+  valid-jsdoc:
+  - error
+  - requireReturn: false
+settings:
+  import/ignore:
+    - node_modules
+    - \.scss$

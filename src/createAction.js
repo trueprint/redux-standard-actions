@@ -1,35 +1,33 @@
-import identity from 'lodash.identity';
+import identity from 'lodash.identity'
 
 export default function createAction(type, actionCreator, metaCreator) {
   const finalActionCreator = typeof actionCreator === 'function'
     ? actionCreator
-    : identity;
+    : identity
 
   const actionHandler = (...args) => {
-    const hasError = args[0] instanceof Error;
+    const hasError = args[0] instanceof Error
 
-    const action = {
-      type
-    };
+    const action = { type }
 
-    const payload = hasError ? args[0] : finalActionCreator(...args);
+    const payload = hasError ? args[0] : finalActionCreator(...args)
     if (!(payload === null || payload === undefined)) {
-      action.payload = payload;
+      action.payload = payload
     }
 
     if (hasError) {
       // Handle FSA errors where the payload is an Error object. Set error.
-      action.error = true;
+      action.error = true
     }
 
     if (typeof metaCreator === 'function') {
-      action.meta = metaCreator(...args);
+      action.meta = metaCreator(...args)
     }
 
-    return action;
-  };
+    return action
+  }
 
-  actionHandler.toString = () => type;
+  actionHandler.toString = () => type
 
-  return actionHandler;
+  return actionHandler
 }

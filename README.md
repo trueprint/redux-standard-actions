@@ -1,8 +1,8 @@
-redux-actions
-=============
+redux-standard-actions
+======================
 
-[![build status](https://img.shields.io/travis/acdlite/redux-actions/master.svg?style=flat-square)](https://travis-ci.org/acdlite/redux-actions)
-[![npm version](https://img.shields.io/npm/v/redux-actions.svg?style=flat-square)](https://www.npmjs.com/package/redux-actions)
+[![build status](https://img.shields.io/travis/yangmillstheory/redux-standard-actions/master.svg?style=shield)](https://travis-ci.org/yangmillstheory/redux-standard-actions)
+[![npm version](https://img.shields.io/npm/v/redux-standard-actions.svg?style=shield)](https://www.npmjs.com/package/redux-standard-actions)
 
 [Flux Standard Action](https://github.com/acdlite/flux-standard-action) utilities for Redux.
 

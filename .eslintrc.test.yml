@@ -1,0 +1,11 @@
+---
+extends: '.eslintrc.yml'
+env:
+  mocha: true
+globals:
+  describe: true
+  expect: true
+  it: true
+rules:
+  no-unused-expressions: off
+
