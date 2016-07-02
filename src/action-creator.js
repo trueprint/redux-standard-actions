@@ -1,16 +1,17 @@
 import identity from 'lodash.identity'
+import isFunction from 'lodash.isfunction'
 
-export default function createAction(type, actionCreator, metaCreator) {
-  const finalActionCreator = typeof actionCreator === 'function'
-    ? actionCreator
-    : identity
+export default function actionCreator(type, payloadCreator = identity, metaCreator) {
+  if (!isFunction(payloadCreator)) {
+    throw new TypeError(`Expected payloadCreator to be a function, got ${typeof payloadCreator}`)
+  }
 
   const actionHandler = (...args) => {
     const hasError = args[0] instanceof Error
 
     const action = { type }
 
-    const payload = hasError ? args[0] : finalActionCreator(...args)
+    const payload = hasError ? args[0] : payloadCreator(...args)
     if (!(payload === null || payload === undefined)) {
       action.payload = payload
     }

@@ -2,17 +2,6 @@ import isPlainObject from 'lodash.isplainobject'
 import isFunction from 'lodash.isfunction'
 
 /**
- * Checks if the argument is a payload creator,
- * which is a function with non-zero arity.
- *
- * @param {*} payloadCreator the payloadCreator to check for validity
- * @returns {boolean} whether or not payloadCreator is usable
- */
-export function isPayloadCreator(payloadCreator) {
-  return isFunction(payloadCreator) && !!payloadCreator.length
-}
-
-/**
  * Returns whether or not the argument is a usable reducer. The
  * argument must be an n-ary function with n greater than 0, or undefined.
  *
@@ -45,3 +34,5 @@ export function isUsableFSAReducer(fsaReducer) {
   }
   return false
 }
+
+export default { isUsableFSAReducer }

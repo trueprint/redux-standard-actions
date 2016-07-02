@@ -1,6 +1,6 @@
 import identity from 'lodash.identity'
 
-import { handleAction, createAction } from '../'
+import { handleAction, actionCreator } from '../'
 
 describe('handleAction()', () => {
   const type = 'TYPE'
@@ -43,7 +43,7 @@ describe('handleAction()', () => {
     })
 
     it('accepts action function as action type', () => {
-      const incrementAction = createAction(type)
+      const incrementAction = actionCreator(type)
       const reducer = handleAction(incrementAction, (state, action) => ({
         counter: state.counter + action.payload,
       }))

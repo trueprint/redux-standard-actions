@@ -1,22 +1,22 @@
 import { isFSA } from 'flux-standard-action'
 
-import { createAction } from '../'
+import { actionCreator } from '../'
 
-describe('createAction()', () => {
+describe('actionCreator()', () => {
   describe('resulting action creator', () => {
     const type = 'TYPE'
 
     it('returns a valid FSA', () => {
-      const actionCreator = createAction(type, b => b)
+      const myActionCreator = actionCreator(type, b => b)
       const foobar = { foo: 'bar' }
-      const action = actionCreator(foobar)
+      const action = myActionCreator(foobar)
       expect(isFSA(action)).to.be.true
     })
 
     it('uses return value as payload', () => {
-      const actionCreator = createAction(type, b => b)
+      const myActionCreator = actionCreator(type, b => b)
       const foobar = { foo: 'bar' }
-      const action = actionCreator(foobar)
+      const action = myActionCreator(foobar)
       expect(action).to.deep.equal({
         type,
         payload: foobar,
@@ -24,9 +24,9 @@ describe('createAction()', () => {
     })
 
     it('uses identity function if actionCreator is not a function', () => {
-      const actionCreator = createAction(type)
+      const myActionCreator = actionCreator(type)
       const foobar = { foo: 'bar' }
-      const action = actionCreator(foobar)
+      const action = myActionCreator(foobar)
       expect(action).to.deep.equal({
         type,
         payload: foobar,
@@ -35,9 +35,9 @@ describe('createAction()', () => {
     })
 
     it('accepts a second parameter for adding meta to object', () => {
-      const actionCreator = createAction(type, null, ({ cid }) => ({ cid }))
+      const myActionCreator = actionCreator(type, null, ({ cid }) => ({ cid }))
       const foobar = { foo: 'bar', cid: 5 }
-      const action = actionCreator(foobar)
+      const action = myActionCreator(foobar)
       expect(action).to.deep.equal({
         type,
         payload: foobar,
@@ -49,10 +49,10 @@ describe('createAction()', () => {
     })
 
     it('sets error to true if payload is an Error object', () => {
-      const actionCreator = createAction(type)
+      const myActionCreator = actionCreator(type)
       const errObj = new TypeError('this is an error')
 
-      const errAction = actionCreator(errObj)
+      const errAction = myActionCreator(errObj)
       expect(errAction).to.deep.equal({
         type,
         payload: errObj,
@@ -61,7 +61,7 @@ describe('createAction()', () => {
       expect(isFSA(errAction)).to.be.true
 
       const foobar = { foo: 'bar', cid: 5 }
-      const noErrAction = actionCreator(foobar)
+      const noErrAction = myActionCreator(foobar)
       expect(noErrAction).to.deep.equal({
         type,
         payload: foobar,
@@ -70,10 +70,10 @@ describe('createAction()', () => {
     })
 
     it('sets error to true if payload is an Error object and meta is provided', () => {
-      const actionCreator = createAction(type, null, (_, meta) => meta)
+      const myActionCreator = actionCreator(type, null, (_, meta) => meta)
       const errObj = new TypeError('this is an error')
 
-      const errAction = actionCreator(errObj, { foo: 'bar' })
+      const errAction = myActionCreator(errObj, { foo: 'bar' })
       expect(errAction).to.deep.equal({
         type,
         payload: errObj,
@@ -83,24 +83,24 @@ describe('createAction()', () => {
     })
 
     it('sets payload only when defined', () => {
-      const action = createAction(type)()
+      const action = actionCreator(type)()
       expect(action).to.deep.equal({
         type,
       })
 
-      const explictUndefinedAction = createAction(type)(undefined)
+      const explictUndefinedAction = actionCreator(type)(undefined)
       expect(explictUndefinedAction).to.deep.equal({
         type,
       })
 
-      const explictNullAction = createAction(type)(null)
+      const explictNullAction = actionCreator(type)(null)
       expect(explictNullAction).to.deep.equal({
         type,
       })
 
       const baz = '1'
-      const actionCreator = createAction(type, null, () => ({ bar: baz }))
-      expect(actionCreator()).to.deep.equal({
+      const myActionCreator = actionCreator(type, null, () => ({ bar: baz }))
+      expect(myActionCreator()).to.deep.equal({
         type,
         meta: {
           bar: '1',
@@ -108,7 +108,7 @@ describe('createAction()', () => {
       })
 
       for (const validValue of [ false, 0, '' ]) {
-        const expectPayload = createAction(type)(validValue)
+        const expectPayload = actionCreator(type)(validValue)
         expect(expectPayload).to.deep.equal({
           type,
           payload: validValue,
@@ -117,10 +117,10 @@ describe('createAction()', () => {
     })
 
     it('bypasses action creators if payload is an Error object', () => {
-      const actionCreator = createAction(type, () => 'not this', (_, meta) => meta)
+      const myActionCreator = actionCreator(type, () => 'not this', (_, meta) => meta)
       const errObj = new TypeError('this is an error')
 
-      const errAction = actionCreator(errObj, { foo: 'bar' })
+      const errAction = myActionCreator(errObj, { foo: 'bar' })
       expect(errAction).to.deep.equal({
         type,
         payload: errObj,

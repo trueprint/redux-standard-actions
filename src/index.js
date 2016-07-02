@@ -1,11 +1,11 @@
-import createAction from './createAction'
-import createActions from './createActions'
+import actionCreator from './action-creator'
+import actionCreators from './action-creators'
 import handleAction from './handleAction'
 import handleActions from './handleActions'
 
 export {
-  createAction,
-  createActions,
+  actionCreator,
+  actionCreators,
   handleAction,
   handleActions,
 }

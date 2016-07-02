@@ -1,4 +1,4 @@
-import { handleActions, createAction } from '../'
+import { handleActions, actionCreator } from '../'
 
 describe('handleActions', () => {
   it('create a single handler from a map of multiple action handlers', () => {
@@ -55,7 +55,7 @@ describe('handleActions', () => {
   })
 
   it('accepts action function as action type', () => {
-    const incrementAction = createAction('INCREMENT')
+    const incrementAction = actionCreator('INCREMENT')
     const reducer = handleActions({
       [incrementAction]: ({ counter }, { payload: amount }) => ({
         counter: counter + amount,
