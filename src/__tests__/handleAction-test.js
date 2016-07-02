@@ -18,7 +18,7 @@ describe('handleAction()', () => {
     })
 
     it('throws an error in case the reducer has the wrong shape', () => {
-      for (const badReducer of [ 1, { next: identity }, [], 'string' ]) {
+      for (const badReducer of [ 1, { throw: 1 }, [], 'string' ]) {
         expect(() => handleAction(type, badReducer))
           .to.throw(TypeError, 'wrong shape for reducers argument')
       }
@@ -66,49 +66,62 @@ describe('handleAction()', () => {
   })
 
   describe('map of handlers form', () => {
-    describe('resulting reducer', () => {
-      it('should throw an error if next or throw are not functions', () => {
-        expect(() => handleAction('NOTTYPE', { next: 1, throw: [] }))
-          .to.throw(TypeError, 'wrong shape for reducers argument')
-      })
+    it('should throw an error if next or throw are not functions or undefined', () => {
+      expect(() => handleAction('NOTTYPE', { next: 1 }))
+        .to.throw(TypeError, 'wrong shape for reducers argument')
+      expect(() => handleAction('NOTTYPE', { throw: [] }))
+        .to.throw(TypeError, 'wrong shape for reducers argument')
+    })
 
-      it('returns previous state if type does not match', () => {
-        const reducer = handleAction('NOTTYPE', {
-          next: (state, action) => ({
-            counter: state.counter + action.payload,
-          }),
-          throw: identity,
-        })
-        expect(reducer(prevState, { type })).to.equal(prevState)
+    it('returns previous state if type does not match', () => {
+      const reducer = handleAction('NOTTYPE', {
+        next: (state, action) => ({
+          counter: state.counter + action.payload,
+        }),
       })
+      expect(reducer(prevState, { type })).to.equal(prevState)
+    })
 
-      it('uses `next()` if action does not represent an error', () => {
-        const reducer = handleAction(type, {
-          next: (state, action) => ({
-            counter: state.counter + action.payload,
-          }),
-          throw: (state, action) => ({
-            counter: state.counter + action.payload,
-          }),
-        })
-        expect(reducer(prevState, { type, payload: 7 }))
-          .to.deep.equal({
-            counter: 10,
-          })
+    it('should default to identity if next() is undefined', () => {
+      const reducer = handleAction(type, {
+        throw: (state, action) => ({
+          counter: state.counter + action.payload,
+        }),
       })
+      expect(reducer(prevState, { type, payload: 7 })).to.deep.equal(prevState)
+    })
 
-      it('uses `throw()` if action represents an error', () => {
-        const reducer = handleAction(type, {
-          next: identity,
-          throw: (state, action) => ({
-            counter: state.counter + action.payload,
-          }),
-        })
-        expect(reducer(prevState, { type, payload: 7, error: true }))
-          .to.deep.equal({
-            counter: 10,
-          })
+    it('should default to identity if throw() is undefined', () => {
+      const reducer = handleAction(type, {
+        next: (state, action) => ({
+          counter: state.counter + action.payload,
+        }),
       })
+      expect(reducer(prevState, { type, payload: 7, error: true })).to.deep.equal(prevState)
+    })
+
+    it('uses `next()` if action does not represent an error', () => {
+      const reducer = handleAction(type, {
+        next: (state, action) => ({
+          counter: state.counter + action.payload,
+        }),
+      })
+      expect(reducer(prevState, { type, payload: 7 }))
+        .to.deep.equal({
+          counter: 10,
+        })
+    })
+
+    it('uses `throw()` if action represents an error', () => {
+      const reducer = handleAction(type, {
+        throw: (state, action) => ({
+          counter: state.counter + action.payload,
+        }),
+      })
+      expect(reducer(prevState, { type, payload: 7, error: true }))
+        .to.deep.equal({
+          counter: 10,
+        })
     })
   })
 })

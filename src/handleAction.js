@@ -1,24 +1,14 @@
+import isFunction from 'lodash.isfunction'
 import identity from 'lodash.identity'
 
-function isFunction(val) {
-  return typeof val === 'function'
-}
-
-function isValidReducersArg(reducers) {
-  if (isFunction(reducers) || reducers === undefined) {
-    return true
-  } else if (typeof reducers === 'object' && isFunction(reducers.throw) && isFunction(reducers.next)) {
-    return true
-  }
-  return false
-}
+import { isUsableFSAReducer } from './apiUtils'
 
 export default function handleAction(type, reducers = identity, defaultState) {
   const typeValue = isFunction(type)
     ? type.toString()
     : type
 
-  if (!isValidReducersArg(reducers)) {
+  if (!isUsableFSAReducer(reducers)) {
     throw new TypeError('wrong shape for reducers argument')
   }
 
