@@ -2,37 +2,36 @@ import isPlainObject from 'lodash.isplainobject'
 import isFunction from 'lodash.isfunction'
 
 /**
- * Returns whether or not the argument is a usable reducer. The
- * argument must be an n-ary function with n greater than 0, or undefined.
- *
- * Reducers that fail this check are considered bad input.
+ * Returns whether or not the argument is a valid reducer, which is an n-ary
+ * function with n greater than 0 (since it must at least operate on the state).
  *
  * @param {*} reducer the reducer to test for validity
  * @returns {boolean} whether or not the reducer is a valid
  */
-function isUsableReducer(reducer) {
-  return reducer === undefined || (isFunction(reducer) && !!reducer.length)
+function isReducer(reducer) {
+  return isFunction(reducer) && !!reducer.length
 }
 
 /**
- * Returns whether or not a function is a usable FSA reducer. This is a
- * plain object that specifies next or throw reducers (which are
- * usable reducers), or is itself a usable reducer.
+ * Returns whether or not the argument is a usable Flux Standard Action reducer.
  *
- * @param {*} fsaReducer the fsaReducer to test for validity
- * @returns {boolean} whether or not the fsaReducer is valid
+ * This is a plain object that specifies next or throw reducers (which are
+ * themselves usable reducers), or is itself a usable reducer.
+ *
+ * @param {*} reducer the reducer to test for FSA usability
+ * @returns {boolean} whether or not the reducer is valid
  */
-export function isUsableFSAReducer(fsaReducer) {
-  if (isUsableReducer(fsaReducer)) {
+export function isFSAReducer(reducer) {
+  if (isReducer(reducer)) {
     return true
   } else if (
-    isPlainObject(fsaReducer) &&
-    isUsableReducer(fsaReducer.next) &&
-    isUsableReducer(fsaReducer.throw)
+    isPlainObject(reducer) &&
+    (!reducer.next || isReducer(reducer.next)) &&
+    (!reducer.throw || isReducer(reducer.throw))
   ) {
     return true
   }
   return false
 }
 
-export default { isUsableFSAReducer }
+export default { isFSAReducer }

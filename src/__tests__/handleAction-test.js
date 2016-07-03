@@ -1,31 +1,31 @@
 import identity from 'lodash.identity'
 
-import { makeActionReducer, makeActionCreator } from '../'
+import { makeReducer, makeActionCreator } from '../'
 
-describe('makeActionReducer()', () => {
+describe('makeReducer()', () => {
   const type = 'TYPE'
   const prevState = { counter: 3 }
 
   describe('single handler form', () => {
     it('returns previous state if type does not match', () => {
-      const reducer = makeActionReducer('NOTTYPE', identity)
+      const reducer = makeReducer('NOTTYPE', identity)
       expect(reducer(prevState, { type })).to.equal(prevState)
     })
 
     it('uses the identity if given an undefined reducer', () => {
-      const reducer = makeActionReducer(type)
+      const reducer = makeReducer(type)
       expect(reducer(prevState, { type })).to.equal(prevState)
     })
 
     it('throws an error in case the reducer has the wrong shape', () => {
       for (const badReducer of [ 1, { throw: 1 }, [], 'string' ]) {
-        expect(() => makeActionReducer(type, badReducer))
+        expect(() => makeReducer(type, badReducer))
           .to.throw(TypeError, 'wrong shape for reducer argument')
       }
     })
 
     it('returns default state if type does not match', () => {
-      const reducer = makeActionReducer('NOTTYPE', identity, { counter: 7 })
+      const reducer = makeReducer('NOTTYPE', identity, { counter: 7 })
       expect(reducer(undefined, { type }))
         .to.deep.equal({
           counter: 7,
@@ -33,7 +33,7 @@ describe('makeActionReducer()', () => {
     })
 
     it('accepts single function as handler', () => {
-      const reducer = makeActionReducer(type, (state, action) => ({
+      const reducer = makeReducer(type, (state, action) => ({
         counter: state.counter + action.payload,
       }))
       expect(reducer(prevState, { type, payload: 7 }))
@@ -44,7 +44,7 @@ describe('makeActionReducer()', () => {
 
     it('accepts action function as action type', () => {
       const incrementAction = makeActionCreator(type)
-      const reducer = makeActionReducer(incrementAction, (state, action) => ({
+      const reducer = makeReducer(incrementAction, (state, action) => ({
         counter: state.counter + action.payload,
       }))
 
@@ -55,7 +55,7 @@ describe('makeActionReducer()', () => {
     })
 
     it('accepts single function as handler and a default state', () => {
-      const reducer = makeActionReducer(type, (state, action) => ({
+      const reducer = makeReducer(type, (state, action) => ({
         counter: state.counter + action.payload,
       }), { counter: 3 })
       expect(reducer(undefined, { type, payload: 7 }))
@@ -67,14 +67,14 @@ describe('makeActionReducer()', () => {
 
   describe('map of handlers form', () => {
     it('should throw an error if next or throw are not functions or undefined', () => {
-      expect(() => makeActionReducer('NOTTYPE', { next: 1 }))
+      expect(() => makeReducer('NOTTYPE', { next: 1 }))
         .to.throw(TypeError, 'wrong shape for reducer argument')
-      expect(() => makeActionReducer('NOTTYPE', { throw: [] }))
+      expect(() => makeReducer('NOTTYPE', { throw: [] }))
         .to.throw(TypeError, 'wrong shape for reducer argument')
     })
 
     it('returns previous state if type does not match', () => {
-      const reducer = makeActionReducer('NOTTYPE', {
+      const reducer = makeReducer('NOTTYPE', {
         next: (state, action) => ({
           counter: state.counter + action.payload,
         }),
@@ -83,7 +83,7 @@ describe('makeActionReducer()', () => {
     })
 
     it('should default to identity if next() is undefined', () => {
-      const reducer = makeActionReducer(type, {
+      const reducer = makeReducer(type, {
         throw: (state, action) => ({
           counter: state.counter + action.payload,
         }),
@@ -92,7 +92,7 @@ describe('makeActionReducer()', () => {
     })
 
     it('should default to identity if throw() is undefined', () => {
-      const reducer = makeActionReducer(type, {
+      const reducer = makeReducer(type, {
         next: (state, action) => ({
           counter: state.counter + action.payload,
         }),
@@ -101,7 +101,7 @@ describe('makeActionReducer()', () => {
     })
 
     it('uses `next()` if action does not represent an error', () => {
-      const reducer = makeActionReducer(type, {
+      const reducer = makeReducer(type, {
         next: (state, action) => ({
           counter: state.counter + action.payload,
         }),
@@ -113,7 +113,7 @@ describe('makeActionReducer()', () => {
     })
 
     it('uses `throw()` if action represents an error', () => {
-      const reducer = makeActionReducer(type, {
+      const reducer = makeReducer(type, {
         throw: (state, action) => ({
           counter: state.counter + action.payload,
         }),

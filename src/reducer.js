@@ -1,15 +1,15 @@
 import isFunction from 'lodash.isfunction'
 import identity from 'lodash.identity'
 
-import { isUsableFSAReducer } from './utils'
+import { isFSAReducer } from './utils'
 
-export default function makeActionReducer(actionType, reducer = identity, defaultState) {
+export default function makeReducer(actionType, reducer = identity, defaultState) {
   const type = isFunction(actionType)
     // allow actionType to be one of our action creators
     ? actionType.toString()
     : actionType
 
-  if (!isUsableFSAReducer(reducer)) {
+  if (!isFSAReducer(reducer)) {
     throw new TypeError('wrong shape for reducer argument')
   }
 
