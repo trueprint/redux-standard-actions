@@ -15,7 +15,13 @@ describe('makeActionReducer', () => {
       expect(reducer(prevState, { type })).to.equal(prevState)
     })
 
-    it('should throws an error when the reducer has the wrong shape', () => {
+    it('should throw an error when type is undefined', () => {
+      expect(
+        () => makeActionReducer(undefined, state => state)
+      ).to.throw(TypeError, 'Expected type to not be undefined')
+    })
+
+    it('should throw an error when the reducer has the wrong shape', () => {
       for (const badReducer of [ 1, { throw: 1 }, [], 'string' ]) {
         expect(
           () => makeActionReducer(type, badReducer)

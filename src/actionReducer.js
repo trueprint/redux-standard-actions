@@ -16,6 +16,8 @@ import isFSAReducer from './isFSAReducer'
 export default function makeActionReducer(type, reducer = identity, defaultState) {
   if (!isFSAReducer(reducer)) {
     throw new TypeError('Use a function, undefined, or object with next/throw reducers for reducer argument')
+  } else if (type === undefined) {
+    throw new TypeError('Expected type to not be undefined')
   }
 
   // .toString() is safe, and handles passing in our action creators. See
