@@ -19,7 +19,7 @@ describe('makeActionReducer', () => {
       for (const badReducer of [ 1, { throw: 1 }, [], 'string' ]) {
         expect(
           () => makeActionReducer(type, badReducer)
-        ).to.throw(TypeError, 'Wrong shape for reducer argument, use a function or object with next/throw reducers.')
+        ).to.throw(TypeError, 'Use a function, undefined, or object with next/throw reducers for reducer argument')
       }
     })
 
@@ -70,10 +70,10 @@ describe('makeActionReducer', () => {
     it('should throw an error if next or throw are not functions or undefined', () => {
       expect(
         () => makeActionReducer(type, { next: 1 })
-      ).to.throw(TypeError, 'Wrong shape for reducer argument, use a function or object with next/throw reducers.')
+      ).to.throw(TypeError, 'Use a function, undefined, or object with next/throw reducers for reducer argument')
       expect(
         () => makeActionReducer(type, { throw: [] })
-      ).to.throw(TypeError, 'Wrong shape for reducer argument, use a function or object with next/throw reducers.')
+      ).to.throw(TypeError, 'Use a function, undefined, or object with next/throw reducers for reducer argument')
     })
 
     it('returns previous state if type does not match', () => {
