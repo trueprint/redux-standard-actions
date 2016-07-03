@@ -5,16 +5,16 @@ import reduce from 'lodash.reduce'
 import isString from 'lodash.isstring'
 import isFunction from 'lodash.isfunction'
 
-import actionCreator from './action-creator'
+import { makeActionCreator } from './actionCreator'
 
-function fromPlainObject(reducersByActions) {
-  return reduce(reducersByActions, (actionCreatorsByAction, payloadCreator = identity, action) => {
+function fromPlainObject(actionsMap) {
+  return reduce(actionsMap, (actionCreatorsMap, payloadCreator = identity, action) => {
     if (!isFunction(payloadCreator)) {
       throw new TypeError(`Got invalid payload creator for ${action}`)
     }
     return {
-      ...actionCreatorsByAction,
-      [camelCase(action)]: actionCreator(action, payloadCreator),
+      ...actionCreatorsMap,
+      [camelCase(action)]: makeActionCreator(action, payloadCreator),
     }
   }, {})
 }
@@ -28,12 +28,11 @@ function fromActionTypes(...actionTypes) {
 /**
  * Convenience function for creating multiple action creators. All arguments are optional.
  *
- * @param {object} actionsMap a plain object with action types as keys, and their payload creators as values.
- *                            undefined payload creators will be use the identity function as payload creator
+ * @param {object} actionsMap a map of action types to payload creators. undefined payload creators use the identity
  * @param {...string} actionTypes a variable number of string action types, which will use the default payload creator
- * @returns {object} a map of action creators keyed by action type
+ * @returns {object} a map of FSA creators keyed by action type
  */
-export default function actionCreators(actionsMap, ...actionTypes) {
+function makeActionCreators(actionsMap, ...actionTypes) {
   if (actionTypes.every(isString)) {
     if (isString(actionsMap)) {
       return fromActionTypes(actionsMap, ...actionTypes)
@@ -43,3 +42,5 @@ export default function actionCreators(actionsMap, ...actionTypes) {
   }
   throw new TypeError('Expected (optional) object followed by string action types')
 }
+
+export default { makeActionCreators }

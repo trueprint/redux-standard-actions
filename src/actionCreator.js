@@ -1,34 +1,33 @@
 import identity from 'lodash.identity'
 import isFunction from 'lodash.isfunction'
+import isNil from 'lodash.isnil'
 
-export default function actionCreator(type, payloadCreator = identity, metaCreator) {
+function makeActionCreator(type, payloadCreator = identity, metaCreator) {
   if (!isFunction(payloadCreator)) {
     throw new TypeError(`Expected payloadCreator to be a function, got ${typeof payloadCreator}`)
   }
 
-  const actionHandler = (...args) => {
+  const actionCreator = (...args) => {
     const hasError = args[0] instanceof Error
-
     const action = { type }
-
     const payload = hasError ? args[0] : payloadCreator(...args)
-    if (!(payload === null || payload === undefined)) {
+
+    if (!isNil(payload)) {
       action.payload = payload
     }
-
     if (hasError) {
-      // Handle FSA errors where the payload is an Error object. Set error.
       action.error = true
     }
-
-    if (typeof metaCreator === 'function') {
+    if (isFunction(metaCreator)) {
       action.meta = metaCreator(...args)
     }
 
     return action
   }
 
-  actionHandler.toString = () => type
+  actionCreator.toString = () => type
 
-  return actionHandler
+  return actionCreator
 }
+
+export default { makeActionCreator }
