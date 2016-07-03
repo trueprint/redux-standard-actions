@@ -1,7 +1,7 @@
 import isFunction from 'lodash.isfunction'
 import identity from 'lodash.identity'
 
-import { isFSAReducer } from './utils'
+import isFSAReducer from './isFSAReducer'
 
 export default function makeReducer(actionType, reducer = identity, defaultState) {
   const type = isFunction(actionType)

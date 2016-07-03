@@ -21,7 +21,7 @@ function isReducer(reducer) {
  * @param {*} reducer the reducer to test for FSA usability
  * @returns {boolean} whether or not the reducer is valid
  */
-export function isFSAReducer(reducer) {
+export default function isFSAReducer(reducer) {
   if (isReducer(reducer)) {
     return true
   } else if (
@@ -33,5 +33,3 @@ export function isFSAReducer(reducer) {
   }
   return false
 }
-
-export default { isFSAReducer }
