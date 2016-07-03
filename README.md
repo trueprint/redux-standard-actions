@@ -6,21 +6,26 @@ redux-standard-actions
 
 [Flux Standard Action](https://github.com/acdlite/flux-standard-action) utilities for Redux.
 
-This project was a fork of [redux-actions](https://github.com/acdlite/redux-actions). 
+This project was a fork of [redux-actions](https://github.com/acdlite/redux-actions). It's now developed and published as a separate NPM module for active maintenance and to optimize on development iteration speed.
 
-It's now developed and published as a separate NPM module to optimize on development iteration speed and have active maintenance.
+---
 
-## Getting started 
+### Getting started
+ 
+Install via NPM.
 
 ```js
 npm install --save redux-standard-actions
 ```
 
-## API
+---
 
-### Actions
+### API
 
-#### `makeActionCreator(type, payloadCreator = identity, ?metaCreator)`
+
+#### Actions
+
+##### `makeActionCreator(type, payloadCreator = identity, ?metaCreator)`
 
 Returns an Flux Standard Action creator. 
 
@@ -48,7 +53,7 @@ expect(increment(error)).to.deep.equal({ type: 'INCREMENT', payload: error, erro
 ```
 
 
-#### `makeActionCreators(?actionsMap, ?...actionTypes)`
+##### `makeActionCreators(?actionsMap, ?...actionTypes)`
 
 Returns an object mapping action types to Flux Standard Action creators. 
 
@@ -87,9 +92,9 @@ expect(actionThree(3)).to.deep.equal({
 ```
 
 
-### Reducers
+#### Reducers
 
-#### `makeActionReducer(type, reducerFn | reducerMap, ?defaultState)`
+##### `makeActionReducer(type, reducerFn | reducerMap, ?defaultState)`
 
 Returns a reducer that handles Flux Standard Actions of a certain type.
 
@@ -115,7 +120,7 @@ makeActionReducer('LOGIN', {
 
 The optional third parameter specifies a default state which is used when an `undefined` state is passed to the reducer.
 
-### `makeActionReducers(reducerMap, ?defaultState)`
+##### `makeActionReducers(reducerMap, ?defaultState)`
 
 Returns a reduced form of multiple action reducers. 
 
@@ -124,8 +129,6 @@ Returns a reduced form of multiple action reducers.
 Any undefined reducer will be defaulted to the identity, as in `makeActionReducer`.
 
 The optional second parameter specifies a default or initial state, which is used when `undefined` is passed to the reduced reducer.
-
-Example:
 
 ```js
 const increment = makeActionCreator('INCREMENT');
@@ -146,6 +149,7 @@ expect(reducer({ counter: 3 }, increment(7))).to.deep.equal({ counter: 10 })
 expect(reducer({ counter: 3 }, decrement(1))).to.deep.equal({ counter: 2 })
 ```
 
-##  Usage with middleware
+---
+###  Usage with middleware
 
 See [redux-thunk](https://github.com/gaearon/redux-thunk), or [redux-saga](https://github.com/yelouafi/redux-saga).
