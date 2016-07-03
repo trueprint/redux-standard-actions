@@ -1,4 +1,4 @@
-import makeActionReducer from './reducer'
+import makeActionReducer from './actionReducer'
 
 export default function makeActionReducers(reducersMap, defaultState) {
   const actionReducers = Object
