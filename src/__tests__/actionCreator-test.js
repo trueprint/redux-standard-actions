@@ -41,7 +41,7 @@ describe('makeActionCreator', () => {
 
   it('should set error to true and not use the payload creator if passed an error', () => {
     const actionCreator = makeActionCreator(type, () => 'this will not be the payload')
-    const error = new TypeError()
+    const error = new TypeError
     const action = actionCreator(error)
 
     expect(action).to.deep.equal({ type, payload: error, error: true })
@@ -50,7 +50,7 @@ describe('makeActionCreator', () => {
 
   it('should set error to true and use the meta creator if passed an error', () => {
     const actionCreator = makeActionCreator(type, undefined, (payload, key, value) => ({ [key]: value }))
-    const error = new TypeError()
+    const error = new TypeError
 
     const action = actionCreator(error, 'key', 'value')
     expect(action).to.deep.equal({ type, payload: error, error: true, meta: { key: 'value' } })
