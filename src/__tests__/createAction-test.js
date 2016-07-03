@@ -35,7 +35,7 @@ describe('makeActionCreator()', () => {
     })
 
     it('accepts a second parameter for adding meta to object', () => {
-      const actionCreator = makeActionCreator(type, null, ({ cid }) => ({ cid }))
+      const actionCreator = makeActionCreator(type, undefined, ({ cid }) => ({ cid }))
       const foobar = { foo: 'bar', cid: 5 }
       const action = actionCreator(foobar)
       expect(action).to.deep.equal({
@@ -70,7 +70,7 @@ describe('makeActionCreator()', () => {
     })
 
     it('sets error to true if payload is an Error object and meta is provided', () => {
-      const actionCreator = makeActionCreator(type, null, (_, meta) => meta)
+      const actionCreator = makeActionCreator(type, undefined, (_, meta) => meta)
       const errObj = new TypeError('this is an error')
 
       const errAction = actionCreator(errObj, { foo: 'bar' })
@@ -99,7 +99,7 @@ describe('makeActionCreator()', () => {
       })
 
       const baz = '1'
-      const actionCreator = makeActionCreator(type, null, () => ({ bar: baz }))
+      const actionCreator = makeActionCreator(type, undefined, () => ({ bar: baz }))
       expect(actionCreator()).to.deep.equal({
         type,
         meta: {

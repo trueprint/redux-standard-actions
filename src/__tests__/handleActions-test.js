@@ -1,8 +1,8 @@
-import { handleActions, actionCreator } from '../'
+import { makeActionReducers, makeActionCreator } from '../'
 
-describe('handleActions', () => {
+describe('makeActionReducers', () => {
   it('create a single handler from a map of multiple action handlers', () => {
-    const reducer = handleActions({
+    const reducer = makeActionReducers({
       INCREMENT: ({ counter }, { payload: amount }) => ({
         counter: counter + amount,
       }),
@@ -22,23 +22,8 @@ describe('handleActions', () => {
       })
   })
 
-  it('works with symbol action types', () => {
-    const INCREMENT = Symbol()
-
-    const reducer = handleActions({
-      [INCREMENT]: ({ counter }, { payload: amount }) => ({
-        counter: counter + amount,
-      }),
-    })
-
-    expect(reducer({ counter: 3 }, { type: INCREMENT, payload: 7 }))
-      .to.deep.equal({
-        counter: 10,
-      })
-  })
-
   it('accepts a default state as the second parameter', () => {
-    const reducer = handleActions({
+    const reducer = makeActionReducers({
       INCREMENT: ({ counter }, { payload: amount }) => ({
         counter: counter + amount,
       }),
@@ -55,8 +40,8 @@ describe('handleActions', () => {
   })
 
   it('accepts action function as action type', () => {
-    const incrementAction = actionCreator('INCREMENT')
-    const reducer = handleActions({
+    const incrementAction = makeActionCreator('INCREMENT')
+    const reducer = makeActionReducers({
       [incrementAction]: ({ counter }, { payload: amount }) => ({
         counter: counter + amount,
       }),

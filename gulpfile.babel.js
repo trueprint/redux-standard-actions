@@ -31,6 +31,8 @@ function test(...mochaArgs) {
   return spawn('node_modules/.bin/mocha', [
     '--compilers',
     'js:babel-register',
+    '--reporter',
+    'min',
     '--recursive',
     '--require',
     'src/__tests__/init.js',

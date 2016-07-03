@@ -2,7 +2,7 @@ import identity from 'lodash.identity'
 import isFunction from 'lodash.isfunction'
 import isNil from 'lodash.isnil'
 
-function makeActionCreator(type, payloadCreator = identity, metaCreator) {
+export default function makeActionCreator(type, payloadCreator = identity, metaCreator) {
   if (!isFunction(payloadCreator)) {
     throw new TypeError(`Expected payloadCreator to be a function, got ${typeof payloadCreator}`)
   }
@@ -30,4 +30,3 @@ function makeActionCreator(type, payloadCreator = identity, metaCreator) {
   return actionCreator
 }
 
-export default { makeActionCreator }

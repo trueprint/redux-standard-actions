@@ -5,7 +5,7 @@ import reduce from 'lodash.reduce'
 import isString from 'lodash.isstring'
 import isFunction from 'lodash.isfunction'
 
-import { makeActionCreator } from './actionCreator'
+import makeActionCreator from './actionCreator'
 
 function fromPlainObject(actionsMap) {
   return reduce(actionsMap, (actionCreatorsMap, payloadCreator = identity, action) => {
@@ -32,7 +32,7 @@ function fromActionTypes(...actionTypes) {
  * @param {...string} actionTypes a variable number of string action types, which will use the default payload creator
  * @returns {object} a map of FSA creators keyed by action type
  */
-function makeActionCreators(actionsMap, ...actionTypes) {
+export default function makeActionCreators(actionsMap, ...actionTypes) {
   if (actionTypes.every(isString)) {
     if (isString(actionsMap)) {
       return fromActionTypes(actionsMap, ...actionTypes)
@@ -42,5 +42,3 @@ function makeActionCreators(actionsMap, ...actionTypes) {
   }
   throw new TypeError('Expected (optional) object followed by string action types')
 }
-
-export default { makeActionCreators }
