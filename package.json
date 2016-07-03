@@ -1,15 +1,15 @@
 {
-  "name": "redux-actions",
+  "name": "redux-standard-actions",
   "version": "0.10.0",
   "description": "Flux Standard Action utlities for Redux",
-  "main": "lib/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "gulp build",
     "test": "gulp build",
     "dev": "gulp dev"
   },
   "files": [
-    "lib/*.js"
+    "dist/*.js"
   ],
   "keywords": [
     "flux",
@@ -17,14 +17,14 @@
     "fsa",
     "actions"
   ],
-  "author": "Andrew Clark <acdlite@me.com>",
+  "author": "Victor Alvarez <v.alvarez312@gmail.com>",
   "bugs": {
-    "url": "https://github.com/acdlite/redux-actions/issues"
+    "url": "https://github.com/yangmillstheory/redux-standard-actions/issues"
   },
-  "homepage": "https://github.com/acdlite/redux-actions",
+  "homepage": "https://github.com/yangmillstheory/redux-standard-actions",
   "repository": {
     "type": "git",
-    "url": "https://github.com/acdlite/redux-actions.git"
+    "url": "https://github.com/yangmillstheory/redux-standard-actions.git"
   },
   "license": "MIT",
   "devDependencies": {
