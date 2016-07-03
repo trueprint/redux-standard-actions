@@ -7,21 +7,18 @@ import isFunction from 'lodash.isfunction'
 
 import makeActionCreator from './actionCreator'
 
-function fromPlainObject(actionsMap) {
-  return reduce(actionsMap, (actionCreatorsMap, payloadCreator = identity, action) => {
+function fromActionsMap(actionsMap) {
+  return reduce(actionsMap, (actionCreatorsMap, payloadCreator = identity, type) => {
     if (!isFunction(payloadCreator)) {
-      throw new TypeError(`Got invalid payload creator for ${action}`)
+      throw new TypeError(`Expected function or undefined payload creator for ${type}`)
     }
-    return {
-      ...actionCreatorsMap,
-      [camelCase(action)]: makeActionCreator(action, payloadCreator),
-    }
+    return { ...actionCreatorsMap, [camelCase(type)]: makeActionCreator(type, payloadCreator) }
   }, {})
 }
 
-function fromActionTypes(...actionTypes) {
-  return fromPlainObject(
-    actionTypes.reduce((actionsMap, action) => ({ ...actionsMap, [action]: undefined }), {})
+function fromTypes(...types) {
+  return fromActionsMap(
+    types.reduce((actionsMap, action) => ({ ...actionsMap, [action]: undefined }), {})
   )
 }
 
@@ -29,15 +26,15 @@ function fromActionTypes(...actionTypes) {
  * Convenience function for creating multiple action creators. All arguments are optional.
  *
  * @param {object} actionsMap a map of action types to payload creators. undefined payload creators use the identity
- * @param {...string} actionTypes a variable number of string action types, which will use the default payload creator
- * @returns {object} a map of FSA creators keyed by action type
+ * @param {...string} types a variable number of string action types, which will use the default payload creator
+ * @returns {object} a map of FSA creators keyed by camel-cased action type
  */
-export default function makeActionCreators(actionsMap, ...actionTypes) {
-  if (actionTypes.every(isString)) {
+export default function makeActionCreators(actionsMap, ...types) {
+  if (types.every(isString)) {
     if (isString(actionsMap)) {
-      return fromActionTypes(actionsMap, ...actionTypes)
+      return fromTypes(actionsMap, ...types)
     } else if (isPlainObject(actionsMap)) {
-      return { ...fromPlainObject(actionsMap), ...fromActionTypes(...actionTypes) }
+      return { ...fromActionsMap(actionsMap), ...fromTypes(...types) }
     }
   }
   throw new TypeError('Expected (optional) object followed by string action types')
