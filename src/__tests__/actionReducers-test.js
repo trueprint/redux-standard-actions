@@ -64,4 +64,35 @@ describe('makeActionReducers', () => {
     expect(reducer({ counter: 3 }, increment(7))).to.deep.equal({ counter: 10 })
     expect(reducer({ counter: 3 }, decrement(7))).to.deep.equal({ counter: -4 })
   })
+
+  it('should handle actions not dispatched from action creators when defined with action creators', () => {
+    const increment = makeActionCreator('INCREMENT')
+    const decrement = makeActionCreator('DECREMENT')
+
+    const reducer = makeActionReducers({
+      [increment]: (state, { payload: { amount } }) => ({ ...state, counter: state.counter + amount }),
+      [decrement]: {
+        next(state, { payload: { amount } }) {
+          return { ...state, counter: state.counter - amount }
+        },
+        throw(state) {
+          return { ...state, counter: 0 }
+        },
+      },
+    })
+
+    expect(reducer({ counter: 3 }, { type: 'INCREMENT', payload: { amount: 7 } })).to.deep.equal({ counter: 10 })
+    expect(
+      reducer(
+        { counter: 3 },
+        { type: 'DECREMENT', payload: { amount: 7 } },
+      )
+    ).to.deep.equal({ counter: -4 })
+    expect(
+      reducer(
+        { counter: 3 },
+        { type: 'DECREMENT', payload: { amount: 7 }, error: true },
+      )
+    ).to.deep.equal({ counter: 0 })
+  })
 })

@@ -29,15 +29,15 @@ npm install --save redux-standard-actions
 
 Returns an Flux Standard Action creator. 
 
-`payloadCreator` can only be a function or `undefined` (in which case the identity is used). `metaCreator` is an optional function that builds the `meta` value of the action, receiving the same arguments as `payloadCreator`
+`payloadCreator` can only be a function or `undefined` (in which case the identity is used). `metaCreator` is an optional function that builds the `meta` value of the action, receiving the same arguments as `payloadCreator`.
  
 Note that `payload` will only be set on the action if `payloadCreator` does not return `undefined`, and `meta` will be set only if `metaCreator` is a function. 
 
 
 ```js
-let increment = makeActionCreator('DECREMENT', amount => -amount));
+let decrement = makeActionCreator('DECREMENT', amount => -amount));
 
-expect(increment(42)).to.deep.equal({ type: 'DECREMENT', payload: -42 });
+expect(decrement(42)).to.deep.equal({ type: 'DECREMENT', payload: -42 });
 ```
 
 If the action creator is called with an [Error ](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error), `action.error` will be set to `true` and the payload creator will not be called; instead, the payload is set to the error. 
@@ -57,11 +57,11 @@ expect(increment(error)).to.deep.equal({ type: 'INCREMENT', payload: error, erro
 
 Returns an object mapping action types to Flux Standard Action creators. 
 
-The keys of this object are camel-cased from the keys in `actionsMap`.
+The keys of this object are camel-cased from the keys in `actionsMap`; the values are the action creators. 
 
-`actionsMap` is an optional object with action types as keys, and payload creators as values. `actionTypes` is an optional list of positional arguments that are action type strings, and will use the identity payload creator
+`actionsMap` is an optional object with action types as keys, and payload creators as values. `actionTypes` is an optional list of positional arguments that are action type strings; these action types will use the identity payload creator.
  
-**There's currently no support for specifying any `metaCreator` with this syntax.**
+**There's currently no support for specifying any `metaCreator` with this syntax (though it would be easy to add).**
 
 ```js
 const { actionOne, actionTwo, actionThree } = makeActionCreators({
@@ -100,11 +100,11 @@ Returns a reducer that handles Flux Standard Actions of a certain type.
 
 `type` is a string action type, or an action creator from `makeActionCreator`.
 
-If a function `reducerFn` is given, it is used to handle all Flux Standard Actions.
+If a function `reducerFn` is given, it is used to handle all Flux Standard Actions with type `type`.
 
-Otherwise, you can pass an object with separate reducers for `next()` and `throw()`, which will handle non-error and error FSA's, respectively. This API is inspired by the ES6 generator interface.
+Otherwise, you can pass an object `reducerMap` with separate reducers for `next()` and `throw()`, which will handle non-error and error FSA's, respectively. This API is inspired by the ES6 generator interface.
 
-All reducers here must be `undefined` or a function with non-zero arity (it needs to operate on at least the state). Undefined reducers will default to the identity.
+All reducers here must be `undefined` or a function with non-zero arity (it needs to operate on at least the state). `undefined` reducers will default to the identity.
 
 ```js
 makeActionReducer('LOGIN', {
@@ -122,34 +122,54 @@ The optional third parameter specifies a default state which is used when an `un
 
 ##### `makeActionReducers(reducerMap, ?defaultState)`
 
-Returns a reduced form of multiple action reducers. 
+Returns a reduced reducer from multiple action reducers. 
 
 `reducerMap` is an object where the keys are action types or action creators, and the values are the corresponding reducer functions, or an object in the next/throw form. 
 
-Any undefined reducer will be defaulted to the identity, as in `makeActionReducer`.
+Any `undefined` reducer will be defaulted to the identity, as in `makeActionReducer`.
 
 The optional second parameter specifies a default or initial state, which is used when `undefined` is passed to the reduced reducer.
 
 ```js
 const increment = makeActionCreator('INCREMENT');
 const decrement = makeActionCreator('DECREMENT');
-const reducer = makeActionReducers({
-  [increment]: (state, action) => ({
-    counter: state.counter + action.payload
-  }),
 
-  [decrement]: (state, action) => ({
-    counter: state.counter - action.payload
-  })
+const reducer = makeActionReducers({
+  [increment]: (state, { payload: { amount } }) => ({ ...state, counter: state.counter + amount }),
+
+  [decrement]: {
+    next(state, { payload: { amount } }) {
+      return { ...state, counter: state.counter - amount }
+    },
+    throw(state) {
+      return { ...state, counter: 0 }
+    },
+  },
 }, { counter: 0 });
 
 
-expect(reducer(undefined, increment(1))).to.deep.equal({ counter: 1 })
-expect(reducer({ counter: 3 }, increment(7))).to.deep.equal({ counter: 10 })
-expect(reducer({ counter: 3 }, decrement(1))).to.deep.equal({ counter: 2 })
+// can handle errors dispatched from the action creators
+expect(reducer(undefined, increment({ amount: 1 }))).to.deep.equal({ counter: 1 })
+expect(reducer({ counter: 3 }, increment({ amount: 7 }))).to.deep.equal({ counter: 10 })
+expect(reducer({ counter: 3 }, decrement({ amount: 1 }))).to.deep.equal({ counter: 2 })
+
+// can handle actions not dispatched directly from 
+// the action creator (like thunks, e.g.), and error actions as well
+expect(
+  reducer(
+    { counter: 3 },
+    { type: 'DECREMENT', payload: { amount: 7 } }
+  )
+).to.deep.equal({ counter: -4 })
+expect(
+  reducer(
+    { counter: 3 }, 
+    { type: 'DECREMENT', payload: { amount: 7 }, error: true }
+  )
+).to.deep.equal({ counter: 0 })
 ```
 
 ---
 ###  Usage with middleware
 
-See [redux-thunk](https://github.com/gaearon/redux-thunk), or [redux-saga](https://github.com/yelouafi/redux-saga).
+Integrate with [redux-thunk](https://github.com/gaearon/redux-thunk), or [redux-saga](https://github.com/yelouafi/redux-saga).
