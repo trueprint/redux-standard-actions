@@ -1,6 +1,5 @@
 import identity from 'lodash.identity'
 import isFunction from 'lodash.isfunction'
-import isNil from 'lodash.isnil'
 
 export default function makeActionCreator(type, payloadCreator = identity, metaCreator) {
   if (!isFunction(payloadCreator)) {
@@ -12,7 +11,7 @@ export default function makeActionCreator(type, payloadCreator = identity, metaC
     const action = { type }
     const payload = hasError ? args[0] : payloadCreator(...args)
 
-    if (!isNil(payload)) {
+    if (payload !== undefined) {
       action.payload = payload
     }
     if (hasError) {
