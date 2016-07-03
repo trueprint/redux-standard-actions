@@ -1,4 +1,3 @@
-import isString from 'lodash.isstring'
 import isFunction from 'lodash.isfunction'
 import identity from 'lodash.identity'
 
@@ -22,7 +21,7 @@ export default function makeActionReducer(type, reducer = identity, defaultState
   // .toString() is safe, and handles passing in our action creators. See
   //
   //    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/toString
-  const theType = isString(type) ? type : type.toString()
+  const theType = type.toString()
   const [ nextReducer = identity, throwReducer = identity ] = isFunction(reducer)
     ? [ reducer, reducer ]
     : [ reducer.next, reducer.throw ]
