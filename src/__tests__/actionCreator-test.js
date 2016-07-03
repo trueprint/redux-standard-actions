@@ -5,13 +5,6 @@ import { makeActionCreator } from '../'
 describe('makeActionCreator', () => {
   const type = 'TYPE'
 
-  it('should return an FSA', () => {
-    const actionCreator = makeActionCreator(type)
-    const payload = { key: 'value' }
-
-    expect(isFSA(actionCreator(payload))).to.be.true
-  })
-
   it('should use the payload creator', () => {
     const actionCreator = makeActionCreator(type, (key, value) => ({ [key]: value }))
     const action = actionCreator('key', 'value')
@@ -33,7 +26,7 @@ describe('makeActionCreator', () => {
     [ 1, {}, [], false, null ].forEach(badPayloadCreator => {
       expect(
         () => makeActionCreator(type, badPayloadCreator)
-      ).to.throw(TypeError, /Expected payloadCreator to be a function/)
+      ).to.throw(TypeError, /Expected payloadCreator to be a function or undefined/)
     })
   })
 
@@ -46,8 +39,8 @@ describe('makeActionCreator', () => {
     expect(isFSA(action)).to.be.true
   })
 
-  it('should set error to true and not run the payload creator if passed an error', () => {
-    const actionCreator = makeActionCreator(type, payload => ({ payload }))
+  it('should set error to true and not use the payload creator if passed an error', () => {
+    const actionCreator = makeActionCreator(type, () => 'this will not be the payload')
     const error = new TypeError()
     const action = actionCreator(error)
 
@@ -55,15 +48,15 @@ describe('makeActionCreator', () => {
     expect(isFSA(action)).to.be.true
   })
 
-  it('should set error to true if passed an error and meta creator is provided', () => {
-    const actionCreator = makeActionCreator(type, undefined, (payload, meta) => meta)
+  it('should set error to true and use the meta creator if passed an error', () => {
+    const actionCreator = makeActionCreator(type, undefined, (payload, key, value) => ({ [key]: value }))
     const error = new TypeError()
 
-    const action = actionCreator(error, { key: 'value' })
+    const action = actionCreator(error, 'key', 'value')
     expect(action).to.deep.equal({ type, payload: error, error: true, meta: { key: 'value' } })
   })
 
-  it('should set payload only when defined', () => {
+  it('should set payload if and only if it is not undefined (null payload is allowed)', () => {
     const actionCreator = makeActionCreator(type, undefined, (payload, meta) => meta.id)
     const undefinedPayloadFSA = actionCreator(undefined, { id: 5 })
     const nullPayloadFSA = actionCreator(null, { id: 5 })
@@ -72,13 +65,5 @@ describe('makeActionCreator', () => {
     expect(nullPayloadFSA).to.deep.equal({ type, payload: null, meta: 5 })
     expect(isFSA(undefinedPayloadFSA)).to.be.true
     expect(isFSA(nullPayloadFSA)).to.be.true
-  })
-
-  it('should bypass payload creator if payload is an error', () => {
-    const actionCreator = makeActionCreator(type, () => 'this will not be the payload', (payload, meta) => meta)
-    const error = new TypeError()
-    const action = actionCreator(error, { key: 'value' })
-
-    expect(action).to.deep.equal({ type, payload: error, error: true, meta: { key: 'value' } })
   })
 })
