@@ -15,6 +15,8 @@ import isFunction from 'lodash.isfunction'
 export default function makeActionCreator(type, payloadCreator = identity, metaCreator) {
   if (!isFunction(payloadCreator)) {
     throw new TypeError(`Expected payloadCreator to be a function or undefined, got ${typeof payloadCreator}`)
+  } else if (metaCreator !== undefined && !isFunction(metaCreator)) {
+    throw new TypeError(`Expected metaCreator to be a function or undefined, got ${typeof metaCreator}`)
   }
 
   const actionCreator = (...args) => {
@@ -28,7 +30,7 @@ export default function makeActionCreator(type, payloadCreator = identity, metaC
     if (hasError) {
       action.error = true
     }
-    if (isFunction(metaCreator)) {
+    if (metaCreator) {
       action.meta = metaCreator(...args)
     }
 

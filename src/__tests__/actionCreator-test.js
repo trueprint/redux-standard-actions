@@ -30,6 +30,14 @@ describe('makeActionCreator', () => {
     })
   })
 
+  it('should raise an error if the meta creator is not undefined and not a function', () => {
+    [ 1, {}, [], false, null ].forEach(metaCreator => {
+      expect(
+        () => makeActionCreator(type, undefined, metaCreator)
+      ).to.throw(TypeError, /Expected metaCreator to be a function or undefined/)
+    })
+  })
+
   it('should use the meta creator', () => {
     const actionCreator = makeActionCreator(type, undefined, ({ id }) => id)
     const payload = { key: 'value', id: 5 }
