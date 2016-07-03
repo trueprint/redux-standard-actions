@@ -1,8 +1,8 @@
-import { makeReducers, makeActionCreator } from '../'
+import { makeActionReducers, makeActionCreator } from '../'
 
-describe('makeReducers', () => {
+describe('makeActionReducers', () => {
   it('create a single handler from a map of multiple action handlers', () => {
-    const reducer = makeReducers({
+    const reducer = makeActionReducers({
       INCREMENT: ({ counter }, { payload: amount }) => ({
         counter: counter + amount,
       }),
@@ -23,7 +23,7 @@ describe('makeReducers', () => {
   })
 
   it('accepts a default state as the second parameter', () => {
-    const reducer = makeReducers({
+    const reducer = makeActionReducers({
       INCREMENT: ({ counter }, { payload: amount }) => ({
         counter: counter + amount,
       }),
@@ -41,7 +41,7 @@ describe('makeReducers', () => {
 
   it('accepts action function as action type', () => {
     const incrementAction = makeActionCreator('INCREMENT')
-    const reducer = makeReducers({
+    const reducer = makeActionReducers({
       [incrementAction]: ({ counter }, { payload: amount }) => ({
         counter: counter + amount,
       }),

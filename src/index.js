@@ -1,11 +1,11 @@
 import makeActionCreator from './actionCreator'
-import makeReducer from './reducer'
+import makeActionReducer from './reducer'
 import makeActionCreators from './actionCreators'
-import makeReducers from './reducers'
+import makeActionReducers from './reducers'
 
 export {
   makeActionCreator,
-  makeReducer,
+  makeActionReducer,
   makeActionCreators,
-  makeReducers,
+  makeActionReducers,
 }

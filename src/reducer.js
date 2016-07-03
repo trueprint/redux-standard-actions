@@ -3,7 +3,7 @@ import identity from 'lodash.identity'
 
 import isFSAReducer from './isFSAReducer'
 
-export default function makeReducer(actionType, reducer = identity, defaultState) {
+export default function makeActionReducer(actionType, reducer = identity, defaultState) {
   const type = isFunction(actionType)
     // allow actionType to be one of our action creators
     ? actionType.toString()

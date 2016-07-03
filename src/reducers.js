@@ -1,9 +1,9 @@
-import makeReducer from './reducer'
+import makeActionReducer from './reducer'
 
-export default function makeReducers(reducersMap, defaultState) {
+export default function makeActionReducers(reducersMap, defaultState) {
   const actionReducers = Object
     .keys(reducersMap)
-    .map(type => makeReducer(type, reducersMap[type]))
+    .map(type => makeActionReducer(type, reducersMap[type]))
 
   return (state = defaultState, action) =>
     actionReducers.reduce(
