@@ -145,3 +145,7 @@ expect(reducer(undefined, increment(1))).to.deep.equal({ counter: 1 })
 expect(reducer({ counter: 3 }, increment(7))).to.deep.equal({ counter: 10 })
 expect(reducer({ counter: 3 }, decrement(1))).to.deep.equal({ counter: 2 })
 ```
+
+##  Usage with middleware
+
+See [redux-thunk](https://github.com/gaearon/redux-thunk), or [redux-saga](https://github.com/yelouafi/redux-saga).
