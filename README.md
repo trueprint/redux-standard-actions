@@ -6,96 +6,73 @@ redux-standard-actions
 
 [Flux Standard Action](https://github.com/acdlite/flux-standard-action) utilities for Redux.
 
-```js
-npm install --save redux-actions
-```
-```js
-import { createAction, handleAction, handleActions } from 'redux-actions';
-```
+This project was a fork of [redux-actions](https://github.com/acdlite/redux-actions). It's now developed and published as a separate NPM module for active maintenance and to optimize on development iteration speed.
 
-### `createAction(type, payloadCreator = Identity, ?metaCreator)`
+---
 
-Wraps an action creator so that its return value is the payload of a Flux Standard Action. If no payload creator is passed, or if it's not a function, the identity function is used.
-
-Example:
-
-```js
-let increment = createAction('INCREMENT', amount => amount);
-// same as
-increment = createAction('INCREMENT');
-
-expect(increment(42)).to.deep.equal({
-  type: 'INCREMENT',
-  payload: 42
-});
-```
-
-If the payload is an instance of an [Error
-object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error),
-redux-actions will automatically set ```action.error``` to true.
-
-Example:
-
-```js
-const increment = createAction('INCREMENT');
-
-const error = new TypeError('not a number');
-expect(increment(error)).to.deep.equal({
-  type: 'INCREMENT',
-  payload: error,
-  error: true
-});
-```
-
-`createAction` also returns its `type` when used as type in `handleAction` or `handleActions`.
-
-Example:
-
-```js
-const increment = createAction('INCREMENT');
-
-// As parameter in handleAction:
-handleAction(increment, {
-  next(state, action) {...},
-  throw(state, action) {...}
-});
-
-// As object key in handleActions:
-const reducer = handleActions({
-  [increment]: (state, action) => ({
-    counter: state.counter + action.payload
-  })
-}, { counter: 0 });
-```
-
-**NOTE:** The more correct name for this function is probably `createActionCreator()`, but that seems a bit redundant.
-
-Use the identity form to create one-off actions:
-
-```js
-createAction('ADD_TODO')('Use Redux');
-```
-
-`metaCreator` is an optional function that creates metadata for the payload. It receives the same arguments as the payload creator, but its result becomes the meta field of the resulting action. If `metaCreator` is undefined or not a function, the meta field is omitted.
-
-### `createActions(?actionsObject, ?...actionTypes)`
-
-`actionsObject` should be an object with action types as keys, and payload creators as values. `undefined` payload creators will be defaulted to the identity. Trailing arguments are string action types with default payload creator. 
-
-`actionTypes` is an array of action types, and is treated as `actionsObject` with no specified payload creators.
+### Getting started
  
-There's currently no support for specifying any `metaCreator` with this syntax.
-
-Example:
+Install via NPM.
 
 ```js
-const { actionOne, actionTwo, actionThree } = createActions({
+npm install --save redux-standard-actions
+```
+
+---
+
+### API
+
+
+#### Actions
+
+##### `makeActionCreator(type, payloadCreator = identity, ?metaCreator)`
+
+Returns an Flux Standard Action creator. 
+
+`payloadCreator` can only be a function or `undefined` (in which case the identity is used). `metaCreator` is an optional function that builds the `meta` value of the action, receiving the same arguments as `payloadCreator`.
+ 
+Note that `payload` will only be set on the action if `payloadCreator` does not return `undefined`, and `meta` will be set only if `metaCreator` is a function. 
+
+
+```js
+let decrement = makeActionCreator('DECREMENT', amount => -amount));
+
+expect(decrement(42)).to.deep.equal({ type: 'DECREMENT', payload: -42 });
+```
+
+If the action creator is called with an [Error ](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error), `action.error` will be set to `true` and the payload creator will not be called; instead, the payload is set to the error. 
+
+Note that the meta creator will still be called in this case.
+
+
+```js
+const decrement = makeActionCreator('DECREMENT', amount => -amount);
+const error = new TypeError('not a number');
+
+expect(decrement(error)).to.deep.equal({ type: 'DECREMENT', payload: error, error: true });
+```
+
+
+##### `makeActionCreators(?actionsMap, ?...actionTypes)`
+
+Returns an object mapping action types to Flux Standard Action creators. 
+
+The keys of this object are camel-cased from the keys in `actionsMap`; the values are the action creators. 
+
+`actionsMap` is an optional object with action types as keys, and payload creators as values. `actionTypes` is an optional list of positional arguments that are action type strings; these action types will use the identity payload creator.
+ 
+**There's currently no support for specifying any `metaCreator` with this syntax (though it would be easy to add).**
+
+```js
+const { actionOne, actionTwo, actionThree } = makeActionCreators({
   ACTION_ONE(key, value) {
     return { [key]: value };
   },
+  
   ACTION_TWO(first, second) {
     return [ first, second ];
   },
+  
 }, 'ACTION_THREE');
 
 expect(actionOne('key', 1)).to.deep.equal({
@@ -115,78 +92,84 @@ expect(actionThree(3)).to.deep.equal({
 ```
 
 
-### `handleAction(type, reducer | reducerMap, ?defaultState)`
+#### Reducers
 
-Wraps a reducer so that it only handles Flux Standard Actions of a certain type.
+##### `makeActionReducer(type, reducerFn | reducerMap, ?defaultState)`
 
-If a single reducer is passed, it is used to handle both normal actions and failed actions. (A failed action is analogous to a rejected promise.) You can use this form if you know a certain type of action will never fail, like the increment example above.
+Returns a reducer that handles Flux Standard Actions of a certain type.
 
-Otherwise, you can specify separate reducers for `next()` and `throw()`. These values can only be functions or null-equivalents. 
+`type` is a string action type, or an action creator from `makeActionCreator`.
 
-This API is inspired by the ES6 generator interface.
+If a function `reducerFn` is given, it is used to handle **all** Flux Standard Actions with type `type`, i.e. those with `error: true` and those without an `error` key.
+
+Otherwise, you can pass an object `reducerMap` with separate reducers for `next()` and `throw()`, which will **only** handle non-error and error FSA's, respectively.
+
+All reducers here must be `undefined` or a function with non-zero arity (it needs to operate on at least the state). `undefined` reducers will default to the identity.
 
 ```js
-handleAction('FETCH_DATA', {
-  next(state, action) {...},
-  throw(state, action) {...}
-});
+makeActionReducer('LOGIN', {
+  next(state, { payload: { userProfile } }) {
+    return { ...state, loggedInUser: userProfile }
+  },
+  throw(state, action) {
+    // reset the state in case anything goes wrong
+    return { ...state, loggedInUser: null }
+  }
+}, { loggedInUser: null });
 ```
 
-If `undefined` or `null` is passed in either the single reducer form, or as the values of `next` or `throw` in the map form, an error is thrown.  
+The optional third parameter specifies a default state which is used when an `undefined` state is passed to the reducer.
 
-The optional third parameter specifies a default or initial state, which is used when `undefined` is passed to the reducer.
+##### `makeActionReducers(reducerMap, ?defaultState)`
 
-### `handleActions(reducerMap, ?defaultState)`
+Returns a reduced reducer from multiple action reducers. 
 
-Creates multiple reducers using `handleAction()` and combines them into a single reducer that handles multiple actions. Accepts a map where the keys are passed as the first parameter to `handleAction()` (the action type), and the values are passed as the second parameter (either a reducer or reducer map).
+`reducerMap` is an object where the keys are action types or action creators, and the values are the corresponding reducer functions, or an object in the next/throw form. 
 
-The optional second parameter specifies a default or initial state, which is used when `undefined` is passed to the reducer.
+Any `undefined` reducer will be defaulted to the identity, as in `makeActionReducer`.
 
-(Internally, `handleActions()` works by applying multiple reducers in sequence using [reduce-reducers](https://github.com/acdlite/reduce-reducers).)
-
-Example:
+The optional second parameter specifies a default or initial state, which is used when `undefined` is passed to the reduced reducer.
 
 ```js
-const reducer = handleActions({
-  INCREMENT: (state, action) => ({
-    counter: state.counter + action.payload
-  }),
+const increment = makeActionCreator('INCREMENT');
+const decrement = makeActionCreator('DECREMENT');
 
-  DECREMENT: (state, action) => ({
-    counter: state.counter - action.payload
-  })
+const reducer = makeActionReducers({
+  [increment]: (state, { payload: { amount } }) => ({ ...state, counter: state.counter + amount }),
+
+  [decrement]: {
+    next(state, { payload: { amount } }) {
+      return { ...state, counter: state.counter - amount }
+    },
+    throw(state) {
+      return { ...state, counter: 0 }
+    },
+  },
 }, { counter: 0 });
+
+
+// can handle errors dispatched from the action creators
+expect(reducer(undefined, increment({ amount: 1 }))).to.deep.equal({ counter: 1 })
+expect(reducer({ counter: 3 }, increment({ amount: 7 }))).to.deep.equal({ counter: 10 })
+expect(reducer({ counter: 3 }, decrement({ amount: 1 }))).to.deep.equal({ counter: 2 })
+
+// can handle actions not dispatched directly from 
+// the action creator, and error actions as well
+expect(
+  reducer(
+    { counter: 3 },
+    { type: 'DECREMENT', payload: { amount: 7 } }
+  )
+).to.deep.equal({ counter: -4 })
+expect(
+  reducer(
+    { counter: 3 }, 
+    { type: 'DECREMENT', payload: new Error, error: true }
+  )
+).to.deep.equal({ counter: 0 })
 ```
 
-## Usage with middleware
+---
+###  Usage with middleware
 
-redux-actions is handy all by itself, however, its real power comes when you combine it with middleware.
-
-The identity form of `createAction` is a great way to create a single action creator that handles multiple payload types. For example, using [redux-promise](https://github.com/acdlite/redux-promise) and [redux-rx](https://github.com/acdlite/redux-rx):
-
-```js
-const addTodo = createAction('ADD_TODO');
-
-// A single reducer...
-handleAction('ADD_TODO', (state = { todos: [] }, action) => ({
-  ...state,
-  todos: [...state.todos, action.payload]
-}));
-
-// ...that works with all of these forms:
-// (Don't forget to use `bindActionCreators()` or equivalent.
-// I've left that bit out)
-addTodo('Use Redux')
-addTodo(Promise.resolve('Weep with joy'));
-addTodo(Observable.of(
-  'Learn about middleware',
-  'Learn about higher-order stores'
-)).subscribe();
-```
-
-## See also
-
-Use redux-actions in combination with FSA-compliant libraries.
-
-- [redux-promise](https://github.com/acdlite/redux-promise) - Promise middleware
-- [redux-rx](https://github.com/acdlite/redux-rx) - Includes observable middleware.
+Integrate with [redux-thunk](https://github.com/gaearon/redux-thunk), or [redux-saga](https://github.com/yelouafi/redux-saga).

@@ -1,29 +1,29 @@
-import { createActions } from '../'
+import { makeActionCreators } from '../'
 
-describe('createActions', () => {
+describe('makeActionCreators', () => {
   it('should throw an error when given arguments that contain a non-string', () => {
     const expectedError = 'Expected (optional) object followed by string action types'
 
-    expect(() => createActions(1)).to.throw(TypeError, expectedError)
-    expect(() => createActions({
+    expect(() => makeActionCreators(1)).to.throw(TypeError, expectedError)
+    expect(() => makeActionCreators({
       ACTION_ONE: undefined,
     }, [])).to.throw(TypeError, expectedError)
-    expect(() => createActions('ACTION_ONE', true)).to.throw(TypeError, expectedError)
+    expect(() => makeActionCreators('ACTION_ONE', true)).to.throw(TypeError, expectedError)
   })
 
   it('should throw an error when given bad payload creators', () => {
-    expect(() => createActions({
-      ACTION_ONE() {},
-    })).to.throw(TypeError, 'Got invalid payload creator for ACTION_ONE')
+    expect(() => makeActionCreators({
+      ACTION_ONE: [],
+    })).to.throw(TypeError, 'Expected function or undefined payload creator for ACTION_ONE')
 
-    expect(() => createActions({
+    expect(() => makeActionCreators({
       ACTION_ONE: undefined,
       ACTION_TWO: 'string',
-    })).to.throw(TypeError, 'Got invalid payload creator for ACTION_TWO')
+    })).to.throw(TypeError, 'Expected function or undefined payload creator for ACTION_TWO')
   })
 
-  it('should return a map of camelized action names to action creators', () => {
-    const { actionOne, actionTwo } = createActions({
+  it('should return a map of camel-cased action types to action creators', () => {
+    const { actionOne, actionTwo } = makeActionCreators({
       ACTION_ONE(key, value) {
         return { [key]: value }
       },
@@ -43,7 +43,7 @@ describe('createActions', () => {
   })
 
   it('should use the identity payload creator if the map value is not a function', () => {
-    const { actionOne, actionTwo } = createActions({
+    const { actionOne, actionTwo } = makeActionCreators({
       ACTION_ONE: undefined,
       ACTION_TWO: undefined,
     })
@@ -59,8 +59,8 @@ describe('createActions', () => {
     })
   })
 
-  it('should use identity payload creators if given multiple actions', () => {
-    const { actionOne, actionTwo } = createActions('ACTION_ONE', 'ACTION_TWO')
+  it('should use identity payload creators if given string action types', () => {
+    const { actionOne, actionTwo } = makeActionCreators('ACTION_ONE', 'ACTION_TWO')
 
     expect(actionOne('payload')).to.deep.equal({
       type: 'ACTION_ONE',
@@ -73,16 +73,8 @@ describe('createActions', () => {
     })
   })
 
-  it('should create an action map from one action type', () => {
-    const { actionOne } = createActions('ACTION_ONE')
-    expect(actionOne('payload')).to.deep.equal({
-      type: 'ACTION_ONE',
-      payload: 'payload',
-    })
-  })
-
   it('should create actions from an object and action types', () => {
-    const { actionOne, actionTwo, actionThree, actionFour } = createActions({
+    const { actionOne, actionTwo, actionThree, actionFour } = makeActionCreators({
       ACTION_ONE(key, value) {
         return { [key]: value }
       },

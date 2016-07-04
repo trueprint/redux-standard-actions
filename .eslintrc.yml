@@ -23,6 +23,9 @@ rules:
   import/newline-after-import: error
   space-before-function-paren: off
   prefer-arrow-callback: off
+  no-use-before-define:
+  - error
+  - functions: false
   array-bracket-spacing:
   - error
   - always
