@@ -22,5 +22,12 @@ export default function combineActions(...types) {
   if (types.length === 0 || !types.every(isValidType)) {
     throw new TypeError('Expected each argument to be a string action type or an action creator')
   }
-  return types.map(type => type.toString()).join(FSA_TYPE_DELIMITER)
+  const combinedActionsString = types.map(type => type.toString()).join(FSA_TYPE_DELIMITER)
+  return Object.create(null, {
+    toString: {
+      value() {
+        return combinedActionsString
+      },
+    },
+  })
 }

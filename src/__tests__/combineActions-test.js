@@ -1,3 +1,5 @@
+import isFunction from 'lodash.isfunction'
+
 import { combineActions, makeActionCreators } from '../'
 
 describe('combineActions', () => {
@@ -11,11 +13,37 @@ describe('combineActions', () => {
     ).to.throw(TypeError, 'Expected each argument to be a string action type or an action creator')
   })
 
-  it('should accept any combination of action creators and action type strings and return a string', () => {
+  it('should accept action creators and action type strings', () => {
     const { actionOne, actionTwo } = makeActionCreators('ACTION_ONE', 'ACTION_TWO')
 
-    expect(combineActions('ACTION_ONE', 'ACTION_TWO')).to.be.a.string
-    expect(combineActions(actionOne, actionTwo)).to.be.a.string
-    expect(combineActions(actionOne, actionTwo, 'ACTION_THREE')).to.be.a.string
+    expect(
+      () => combineActions('ACTION_ONE', 'ACTION_TWO')
+    ).not.to.throw(Error)
+    expect(
+      () => combineActions(actionOne, actionTwo)
+    ).not.to.throw(Error)
+    expect(
+      () => combineActions(actionOne, actionTwo, 'ACTION_THREE')
+    ).not.to.throw(Error)
+  })
+
+  it('should return a stringifiable object', () => {
+    const { actionOne, actionTwo } = makeActionCreators('ACTION_ONE', 'ACTION_TWO')
+
+    expect(
+      isFunction(
+        combineActions('ACTION_ONE', 'ACTION_TWO').toString
+      )
+    ).to.be.ok
+    expect(
+      isFunction(
+        combineActions(actionOne, actionTwo).toString
+      )
+    ).to.be.ok
+    expect(
+      isFunction(
+        combineActions(actionOne, actionTwo, 'ACTION_THREE').toString
+      )
+    ).to.be.ok
   })
 })
