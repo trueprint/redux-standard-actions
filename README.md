@@ -46,10 +46,10 @@ Note that the meta creator will still be called in this case.
 
 
 ```js
-const increment = makeActionCreator('INCREMENT');
+const decrement = makeActionCreator('DECREMENT', amount => -amount);
 const error = new TypeError('not a number');
 
-expect(increment(error)).to.deep.equal({ type: 'INCREMENT', payload: error, error: true });
+expect(decrement(error)).to.deep.equal({ type: 'DECREMENT', payload: error, error: true });
 ```
 
 
@@ -100,9 +100,9 @@ Returns a reducer that handles Flux Standard Actions of a certain type.
 
 `type` is a string action type, or an action creator from `makeActionCreator`.
 
-If a function `reducerFn` is given, it is used to handle all Flux Standard Actions with type `type`.
+If a function `reducerFn` is given, it is used to handle **all** Flux Standard Actions with type `type`, i.e. those with `error: true` and those without an `error` key.
 
-Otherwise, you can pass an object `reducerMap` with separate reducers for `next()` and `throw()`, which will handle non-error and error FSA's, respectively. This API is inspired by the ES6 generator interface.
+Otherwise, you can pass an object `reducerMap` with separate reducers for `next()` and `throw()`, which will **only** handle non-error and error FSA's, respectively.
 
 All reducers here must be `undefined` or a function with non-zero arity (it needs to operate on at least the state). `undefined` reducers will default to the identity.
 
@@ -154,7 +154,7 @@ expect(reducer({ counter: 3 }, increment({ amount: 7 }))).to.deep.equal({ counte
 expect(reducer({ counter: 3 }, decrement({ amount: 1 }))).to.deep.equal({ counter: 2 })
 
 // can handle actions not dispatched directly from 
-// the action creator (like thunks, e.g.), and error actions as well
+// the action creator, and error actions as well
 expect(
   reducer(
     { counter: 3 },
@@ -164,7 +164,7 @@ expect(
 expect(
   reducer(
     { counter: 3 }, 
-    { type: 'DECREMENT', payload: { amount: 7 }, error: true }
+    { type: 'DECREMENT', payload: new Error, error: true }
   )
 ).to.deep.equal({ counter: 0 })
 ```
