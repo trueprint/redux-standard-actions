@@ -23,21 +23,21 @@ describe('makeActionCreators', () => {
   })
 
   it('should return a map of camel-cased action types to action creators', () => {
-    const { action1, action2 } = makeActionCreators({
-      ACTION_1(key, value) {
+    const { actionOne, actionTwo } = makeActionCreators({
+      ACTION_ONE(key, value) {
         return { [key]: value }
       },
-      ACTION_2(first, second) {
+      ACTION_TWO(first, second) {
         return [ first, second ]
       },
     })
 
-    expect(action1('from', 1)).to.deep.equal({
-      type: 'ACTION_1',
+    expect(actionOne('from', 1)).to.deep.equal({
+      type: 'ACTION_ONE',
       payload: { from: 1 },
     })
-    expect(action2('from', 2)).to.deep.equal({
-      type: 'ACTION_2',
+    expect(actionTwo('from', 2)).to.deep.equal({
+      type: 'ACTION_TWO',
       payload: [ 'from', 2 ],
     })
   })
