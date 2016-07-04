@@ -1,7 +1,7 @@
 import isString from 'lodash.isstring'
 import isFunction from 'lodash.isfunction'
 
-export const ACTION_DELIMITER = '|fsa-type-delimiter|'
+export const FSA_TYPE_DELIMITER = '|fsa-type-delimiter|'
 
 function isValidType(type) {
   return isString(type) || isFunction(type)
@@ -22,5 +22,5 @@ export default function combineActions(...types) {
   if (types.length === 0 || !types.every(isValidType)) {
     throw new TypeError('Expected each argument to be a string action type or an action creator')
   }
-  return types.map(type => type.toString()).join(ACTION_DELIMITER)
+  return types.map(type => type.toString()).join(FSA_TYPE_DELIMITER)
 }

@@ -1,12 +1,13 @@
 import isFunction from 'lodash.isfunction'
 import identity from 'lodash.identity'
 
+import { FSA_TYPE_DELIMITER } from './combineActions'
 import isFSAReducer from './isFSAReducer'
 
 /**
  * Returns a reducer that handles Flux Standard Actions of a given type.
  *
- * @param {string} type the action type; can be a string, or an FSA creator, or the result of a combineActions call
+ * @param {string} type the action type; can be a string, an FSA creator, or the result of a combineActions call
  * @param {function} reducer a function of non-zero arity, or undefined (in this case the identity function is used).
  *                           this may also be an object with next and throw reducers, which each handle non-error
  *                           and error actions, respectively
@@ -26,10 +27,10 @@ export default function makeActionReducer(type, reducer = identity, defaultState
   const [ nextReducer = identity, throwReducer = identity ] = isFunction(reducer)
     ? [ reducer, reducer ]
     : [ reducer.next, reducer.throw ]
-  const actionType = type.toString()
+  const actionTypes = type.toString().split(FSA_TYPE_DELIMITER)
 
   return (state = defaultState, action) => {
-    if (action.type !== actionType) {
+    if (actionTypes.indexOf(action.type) === -1) {
       return state
     } else if (action.error === true) {
       return throwReducer(state, action)
