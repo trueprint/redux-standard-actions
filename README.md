@@ -114,7 +114,8 @@ const reducer = makeActionReducer(
     
     throw(state) {
       return { ...state, counter: 0 }
-    }
+    },
+  },
   { counter: 10 }
 )
 
