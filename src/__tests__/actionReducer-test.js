@@ -179,8 +179,8 @@ describe('makeActionReducer', () => {
             return { ...state, payload: action.payload }
           },
 
-          throw(state, action) {
-            return { ...state, threw: true, error: action.payload }
+          throw(state) {
+            return { ...state, threw: true }
           },
         },
       )
@@ -188,13 +188,13 @@ describe('makeActionReducer', () => {
 
       expect(
         reducer({ state: 1 }, actionOne(error))
-      ).to.deep.equal({ state: 1, threw: true, error })
+      ).to.deep.equal({ state: 1, threw: true })
       expect(
         reducer({ state: 1 }, { type: 'ACTION_TWO', payload: error, error: true })
-      ).to.deep.equal({ state: 1, threw: true, error })
+      ).to.deep.equal({ state: 1, threw: true })
       expect(
         reducer({ state: 1 }, { type: 'ACTION_THREE', payload: error, error: true })
-      ).to.deep.equal({ state: 1, threw: true, error })
+      ).to.deep.equal({ state: 1, threw: true })
     })
 
     it('should return the previous state if the action type is not any of the combined actions', () => {

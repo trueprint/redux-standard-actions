@@ -122,14 +122,14 @@ describe('makeActionReducers', () => {
           return { ...state, counter: state.counter + amount }
         },
 
-        throw(state, { payload }) {
-          return { ...state, counter: 0, error: payload }
+        throw(state) {
+          return { ...state, counter: 0 }
         },
       },
     }, { counter: -10 })
     const error = new Error
 
-    // non-errors as before
+    // non-errors
     expect(reducer({ counter: 10 }, increment(5))).to.deep.equal({ counter: 15 })
     expect(reducer({ counter: 10 }, decrement(5))).to.deep.equal({ counter: 5 })
     expect(reducer({ counter: 10 }, { type: 'NOT_TYPE', payload: 1000 })).to.deep.equal({ counter: 10 })
@@ -138,9 +138,9 @@ describe('makeActionReducers', () => {
     // errors
     expect(
       reducer({ counter: 10 }, { type: 'INCREMENT', payload: error, error: true })
-    ).to.deep.equal({ counter: 0, error })
+    ).to.deep.equal({ counter: 0 })
     expect(
       reducer({ counter: 10 }, decrement(error))
-    ).to.deep.equal({ counter: 0, error })
+    ).to.deep.equal({ counter: 0 })
   })
 })
