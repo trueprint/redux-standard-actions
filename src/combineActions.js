@@ -3,10 +3,6 @@ import isFunction from 'lodash.isfunction'
 
 export const FSA_TYPE_DELIMITER = '|fsa-type-delimiter|'
 
-function isValidType(type) {
-  return isString(type) || isFunction(type)
-}
-
 /**
  * Combine any number of FSA types or FSA creators for use by an FSA reducer.
  *
@@ -15,19 +11,22 @@ function isValidType(type) {
  * is encapsulated.
  *
  * @param {...string|function} types positional arguments of string action types and/or action creators
- * @returns {string} the string representation of the combined types, which is only useful as parameters
- *                   in makeActionReducer and makeActionReducers
+ * @returns {object} an object which carries a toString() representation of the combined actions;
+ *                   only useful as parameters in makeActionReducer and makeActionReducers
  */
 export default function combineActions(...types) {
   if (types.length === 0 || !types.every(isValidType)) {
     throw new TypeError('Expected each argument to be a string action type or an action creator')
   }
-  const combinedActionsString = types.map(type => type.toString()).join(FSA_TYPE_DELIMITER)
-  return Object.create(null, {
-    toString: {
-      value() {
-        return combinedActionsString
-      },
-    },
-  })
+  return Object.create(null, combinedActionsDescriptor(types.map(type => type.toString()).join(FSA_TYPE_DELIMITER)))
+}
+
+function isValidType(type) {
+  return isString(type) || isFunction(type)
+}
+
+function combinedActionsDescriptor(toStringValue) {
+  return {
+    toString: { enumerable: true, writable: false, configurable: false, value: () => toStringValue },
+  }
 }
