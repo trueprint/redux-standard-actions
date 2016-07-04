@@ -6,7 +6,7 @@ export const FSA_TYPE_DELIMITER = '|fsa-type-delimiter|'
 /**
  * Combine any number of FSA types or FSA creators for use by an FSA reducer.
  *
- * This method exists because while FSA type strings can be joined with an conventional
+ * This method exists because while FSA type strings can be joined with a conventional
  * delimiter, there is no obvious way for a library user to combine FSA creators, as their type
  * is encapsulated.
  *
