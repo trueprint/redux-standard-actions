@@ -1,4 +1,4 @@
-import { makeActionReducer, makeActionCreator } from '../'
+import { makeActionReducer, makeActionCreator, combineActions } from '../'
 
 describe('makeActionReducer', () => {
   const type = 'TYPE'
@@ -130,6 +130,88 @@ describe('makeActionReducer', () => {
       })
 
       expect(reducer(prevState, { type, payload: 7, error: true })).to.deep.equal({ counter: 10 })
+    })
+  })
+
+  describe('with combined actions', () => {
+    it('should handle combined FSAs in unified form', () => {
+      const actionOne = makeActionCreator('ACTION_ONE')
+      const reducer = makeActionReducer(
+        combineActions(actionOne, 'ACTION_TWO', 'ACTION_THREE'),
+        (state, action) => ({ ...state, state: action.payload })
+      )
+
+      expect(reducer({ state: 0 }, actionOne(1))).to.deep.equal({ state: 1 })
+      expect(reducer({ state: 0 }, { type: 'ACTION_TWO', payload: 2 })).to.deep.equal({ state: 2 })
+      expect(reducer({ state: 0 }, { type: 'ACTION_THREE', payload: 3 })).to.deep.equal({ state: 3 })
+    })
+
+    it('should handle combined FSAs in next/throw form', () => {
+      const actionOne = makeActionCreator('ACTION_ONE')
+      const reducer = makeActionReducer(
+        combineActions(actionOne, 'ACTION_TWO', 'ACTION_THREE'),
+        {
+          next(state, action) {
+            return { ...state, state: action.payload }
+          },
+        },
+      )
+
+      expect(reducer({ state: 0 }, actionOne(1))).to.deep.equal({ state: 1 })
+      expect(reducer({ state: 0 }, { type: 'ACTION_TWO', payload: 2 })).to.deep.equal({ state: 2 })
+      expect(reducer({ state: 0 }, { type: 'ACTION_THREE', payload: 3 })).to.deep.equal({ state: 3 })
+    })
+
+    it('should handle combined error FSAs', () => {
+      const actionOne = makeActionCreator('ACTION_ONE')
+      const reducer = makeActionReducer(
+        combineActions(actionOne, 'ACTION_TWO', 'ACTION_THREE'),
+        {
+          next(state, action) {
+            return { ...state, payload: action.payload }
+          },
+
+          throw(state) {
+            return { ...state, threw: true }
+          },
+        },
+      )
+      const error = new Error
+
+      expect(
+        reducer({ state: 0 }, actionOne(error))
+      ).to.deep.equal({ state: 0, threw: true })
+      expect(
+        reducer({ state: 0 }, { type: 'ACTION_TWO', payload: error, error: true })
+      ).to.deep.equal({ state: 0, threw: true })
+      expect(
+        reducer({ state: 0 }, { type: 'ACTION_THREE', payload: error, error: true })
+      ).to.deep.equal({ state: 0, threw: true })
+    })
+
+    it('should return the previous state if the action type is not any of the combined actions', () => {
+      const reducer = makeActionReducer(
+        combineActions('ACTION_ONE', 'ACTION_TWO'),
+        (state, { payload }) => ({ ...state, state: payload }),
+      )
+
+      expect(
+        reducer({ state: 0 }, { type: 'ACTION_THREE', payload: 1 })
+      ).to.deep.equal({ state: 0 })
+      expect(
+        reducer({ state: 0 }, { type: 'ACTION_THREE', payload: 1 })
+      ).to.deep.equal({ state: 0 })
+    })
+
+    it('should use the default state if the initial state is undefined', () => {
+      const reducer = makeActionReducer(
+        combineActions('INCREMENT', 'DECREMENT'),
+        (state, { payload }) => ({ ...state, counter: state.counter + payload }),
+        { counter: 10 }
+      )
+
+      expect(reducer(undefined, { type: 'INCREMENT', payload: +1 })).to.deep.equal({ counter: 11 })
+      expect(reducer(undefined, { type: 'DECREMENT', payload: -1 })).to.deep.equal({ counter: 9 })
     })
   })
 })
