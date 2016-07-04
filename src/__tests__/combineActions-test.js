@@ -1,5 +1,3 @@
-import isFunction from 'lodash.isfunction'
-
 import { combineActions, makeActionCreators } from '../'
 
 describe('combineActions', () => {
@@ -30,20 +28,8 @@ describe('combineActions', () => {
   it('should return a stringifiable object', () => {
     const { action1, action2 } = makeActionCreators('ACTION_1', 'ACTION_2')
 
-    expect(
-      isFunction(
-        combineActions('ACTION_1', 'ACTION_2').toString
-      )
-    ).to.be.ok
-    expect(
-      isFunction(
-        combineActions(action1, action2).toString
-      )
-    ).to.be.ok
-    expect(
-      isFunction(
-        combineActions(action1, action2, 'ACTION_3').toString
-      )
-    ).to.be.ok
+    expect(combineActions('ACTION_1', 'ACTION_2')).to.respondTo('toString')
+    expect(combineActions(action1, action2)).to.respondTo('toString')
+    expect(combineActions(action1, action2, 'ACTION_3')).to.respondTo('toString')
   })
 })
