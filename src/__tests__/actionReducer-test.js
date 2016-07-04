@@ -134,11 +134,28 @@ describe('makeActionReducer', () => {
   })
 
   describe('with combined actions', () => {
-    it('should handle combined FSAs', () => {
+    it('should handle combined FSAs in unified form', () => {
       const actionOne = makeActionCreator('ACTION_ONE')
       const reducer = makeActionReducer(
         combineActions(actionOne, 'ACTION_TWO'),
         (state, action) => ({ ...state, payload: action.payload })
+      )
+
+      expect(reducer({ state: 1 }, actionOne('action one'))).to.deep.equal({ state: 1, payload: 'action one' })
+      expect(
+        reducer({ state: 1 }, { type: 'ACTION_TWO', payload: 'action two' })
+      ).to.deep.equal({ state: 1, payload: 'action two' })
+    })
+
+    it('should handle combined FSAs in next/throw form', () => {
+      const actionOne = makeActionCreator('ACTION_ONE')
+      const reducer = makeActionReducer(
+        combineActions(actionOne, 'ACTION_TWO'),
+        {
+          next(state, action) {
+            return { ...state, payload: action.payload }
+          },
+        },
       )
 
       expect(reducer({ state: 1 }, actionOne('action one'))).to.deep.equal({ state: 1, payload: 'action one' })
