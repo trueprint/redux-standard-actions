@@ -6,7 +6,7 @@ import isFSAReducer from './isFSAReducer'
 /**
  * Returns a reducer that handles Flux Standard Actions of a given type.
  *
- * @param {string} type the action type; usually an upper-case and snake-case string
+ * @param {string} type the action type; can be a string, or an FSA creator, or the result of a combineActions call
  * @param {function} reducer a function of non-zero arity, or undefined (in this case the identity function is used).
  *                           this may also be an object with next and throw reducers, which each handle non-error
  *                           and error actions, respectively
