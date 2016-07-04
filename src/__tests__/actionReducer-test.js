@@ -1,4 +1,4 @@
-import { makeActionReducer, makeActionCreator } from '../'
+import { makeActionReducer, makeActionCreator, combineActions } from '../'
 
 describe('makeActionReducer', () => {
   const type = 'TYPE'
@@ -130,6 +130,56 @@ describe('makeActionReducer', () => {
       })
 
       expect(reducer(prevState, { type, payload: 7, error: true })).to.deep.equal({ counter: 10 })
+    })
+  })
+
+  describe('with combined actions', () => {
+    it('should handle combined FSAs', () => {
+      const actionOne = makeActionCreator('ACTION_ONE')
+      const reducer = makeActionReducer(
+        combineActions(actionOne, 'ACTION_TWO'),
+        (state, action) => ({ ...state, payload: action.payload })
+      )
+
+      expect(reducer({ state: 1 }, actionOne('action one'))).to.deep.equal({ state: 1, payload: 'action one' })
+      expect(
+        reducer({ state: 1 }, { type: 'ACTION_TWO', payload: 'action two' })
+      ).to.deep.equal({ state: 1, payload: 'action two' })
+    })
+
+    it('should handle combined error FSAs', () => {
+      const actionThree = makeActionCreator('ACTION_THREE')
+      const reducer = makeActionReducer(
+        combineActions('ACTION_ONE', 'ACTION_TWO', actionThree),
+        {
+          next(state, action) {
+            return { ...state, payload: action.payload }
+          },
+
+          throw(state, action) {
+            return { ...state, thrown: true, error: action.payload }
+          },
+        },
+      )
+      const error = new Error
+
+      expect(
+        reducer({ state: 1 }, { type: 'ACTION_ONE', payload: error, error: true })
+      ).to.deep.equal({ state: 1, thrown: true, error })
+      expect(
+        reducer({ state: 1 }, { type: 'ACTION_TWO', payload: error, error: true })
+      ).to.deep.equal({ state: 1, thrown: true, error })
+      expect(
+        reducer({ state: 1 }, actionThree(error))
+      ).to.deep.equal({ state: 1, thrown: true, error })
+    })
+
+    it('should return the previous state if the action type is not any of the combined actions', () => {
+
+    })
+
+    it('should return the default state if the initial state is undefined', () => {
+
     })
   })
 })
