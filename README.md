@@ -23,7 +23,7 @@ npm install --save redux-standard-actions
 ### API
 
 
-#### Actions
+#### Flux Standard Action Creators
 
 ##### `makeActionCreator(type, payloadCreator = identity, ?metaCreator)`
 
@@ -95,7 +95,7 @@ expect(actionThree(3)).to.deep.equal({
 
 Combine any number of FSA types or FSA creators for use by an FSA reducer. 
 
-`types` is a variadic list of arguments which can be action type strings or action creators. 
+`types` is a variadic list of arguments which can be action type strings, action creators, or combined actions from `combineActions`. 
 
 This method exists because while FSA type strings can be joined with a conventional delimiter, there is no obvious way for a library user to combine FSA creators.
 
@@ -127,7 +127,7 @@ expect(reducer(undefined, decrement(new Error)).to.deep.equal({ counter: 0 })
 
 This also works in when declaring reducers with the `next`/`throw` object format in `makeActionReducer` and `makeActionReducers`.
 
-#### Reducers
+#### Flux Standard Action Reducers
 
 ##### `makeActionReducer(type, reducerFn | reducerMap, ?defaultState)`
 
@@ -183,7 +183,7 @@ const reducer = makeActionReducers({
 }, { counter: 0 });
 
 
-// can handle errors dispatched from the action creators
+// can handle actions dispatched from the action creators
 expect(reducer(undefined, increment({ amount: 1 }))).to.deep.equal({ counter: 1 })
 expect(reducer({ counter: 3 }, increment({ amount: 7 }))).to.deep.equal({ counter: 10 })
 expect(reducer({ counter: 3 }, decrement({ amount: 1 }))).to.deep.equal({ counter: 2 })
