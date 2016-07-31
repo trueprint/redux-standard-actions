@@ -95,7 +95,7 @@ expect(actionThree(3)).to.deep.equal({
 
 Combine any number of FSA types or FSA creators for use by an FSA reducer.
 
-`types` is a variadic list of arguments which can be action type strings, action creators, or combined actions from `combineActions`.
+`types` is a variadic list of arguments which can be action type strings or action creators.
 
 This method exists because while FSA type strings can be joined with a conventional delimiter, there is no obvious way for a library user to combine FSA creators.
 
